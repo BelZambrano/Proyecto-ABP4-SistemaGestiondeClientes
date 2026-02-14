@@ -1,0 +1,48 @@
+[
+  {
+    "id_cliente": 1,
+    "nombre": "Juan Perez",
+    "email": "gatojuanito@mail.com",
+    "telefono": "+56912345678"
+  },
+  {
+    "id_cliente": 2,
+    "nombre": "Elena Unknowi",
+    "email": "ElenitaPro@mail.es",
+    "telefono": "+56932165498"
+  },
+  {
+    "id_cliente": 3,
+    "nombre": "Felipe Godoy",
+    "email": "elgatofeli@gmail.com",
+    "telefono": "+56912345678"
+  },
+  {
+    "id_cliente": 4,
+    "nombre": "jose perez",
+    "email": "perezjose@mail.com",
+    "telefono": "+56998745612",
+    "categoria": "normal"
+  },
+  {
+    "id_cliente": 5,
+    "nombre": "maria smith",
+    "email": "smariasmith@mail.com",
+    "telefono": "+56987654321",
+    "categoria": "premium"
+  },
+  {
+    "id_cliente": 6,
+    "nombre": "elias gonzalez",
+    "email": "gonzalezeli@mail.com",
+    "telefono": "+569654987321",
+    "categoria": "corporativo"
+  },
+  {
+    "id_cliente": 7,
+    "nombre": "bob kimani",
+    "email": "marleyfamily@mail.com",
+    "telefono": "+569576852365",
+    "categoria": "premium"
+  }
+]
