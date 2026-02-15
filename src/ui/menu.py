@@ -25,7 +25,9 @@ def run_menu():
             nombre = input("Nombre: ")
             email = input("Email: ")
             telefono = input("Teléfono: ")
-            categoria = input("Categoría (regular/premium/corporativo) [Enter=regular]: ")
+            categoria = input(
+                "Categoría (regular/premium/corporativo) [Enter=regular]: "
+            )
 
             nuevo_id = service.crear_cliente(nombre, email, telefono, categoria)
             print(f"✅ Cliente guardado con ID {nuevo_id}")
@@ -43,6 +45,7 @@ def run_menu():
                     print(f"Email: {c.email}")
                     print(f"Teléfono: {c.telefono}")
                     print(f"Categoría: {c.tipo()}")
+                    print(f"Beneficios: {c.get_beneficios()}")
                     print("-" * 30)
 
         elif opcion == "3":
@@ -74,8 +77,7 @@ def run_menu():
             nuevo_telefono = input(f"Nuevo teléfono ({encontrado.telefono}): ").strip()
             nueva_categoria = input(f"Nueva categoría ({encontrado.tipo()}): ").strip()
 
-            # Editamos el JSON directamente (dicts), usando la lista cargada desde repo
-            clientes_dict = service._cargar_clientes_dict()  # lo implementaremos ahora
+            clientes_dict = service._cargar_clientes_dict()
             for d in clientes_dict:
                 if d.get("id_cliente") == id_buscar:
                     if nuevo_nombre:
@@ -114,16 +116,20 @@ def run_menu():
                 print("Cliente no encontrado.")
                 continue
 
-            confirmacion = input(
-                f"¿Seguro que deseas eliminar a '{encontrado.nombre}'? (s/n): "
-            ).strip().lower()
+            confirmacion = (
+                input(f"¿Seguro que deseas eliminar a '{encontrado.nombre}'? (s/n): ")
+                .strip()
+                .lower()
+            )
 
             if confirmacion != "s":
                 print("Operación cancelada.")
                 continue
 
-            clientes_dict = service._cargar_clientes_dict()  # lo implementaremos ahora
-            clientes_dict = [d for d in clientes_dict if d.get("id_cliente") != id_borrar]
+            clientes_dict = service._cargar_clientes_dict()
+            clientes_dict = [
+                d for d in clientes_dict if d.get("id_cliente") != id_borrar
+            ]
             service._guardar_clientes_dict(clientes_dict)
             print("✅ Cliente eliminado correctamente.")
 

@@ -44,5 +44,12 @@
     "email": "marleyfamily@mail.com",
     "telefono": "+569576852365",
     "categoria": "premium"
+  },
+  {
+    "id_cliente": 8,
+    "nombre": "emilia dides",
+    "email": "emilatop@mail.com",
+    "telefono": "+569879654213",
+    "categoria": "corporativo"
   }
 ]

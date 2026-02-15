@@ -6,7 +6,10 @@ class Cliente:
         self.telefono = telefono
 
     def tipo(self):
-        return "general"
+        return "regular"
+
+    def get_beneficios(self):
+        return "Sin beneficios especiales"
 
     def to_dict(self):
         return {
@@ -22,30 +25,36 @@ class ClienteRegular(Cliente):
     def tipo(self):
         return "regular"
 
+    def get_beneficios(self):
+        return "Sin beneficios especiales"
+
 
 class ClientePremium(Cliente):
     def tipo(self):
         return "premium"
+
+    def get_beneficios(self):
+        return "Descuento del 10%"
 
 
 class ClienteCorporativo(Cliente):
     def tipo(self):
         return "corporativo"
 
+    def get_beneficios(self):
+        return "Descuento del 20% y atención prioritaria"
+
 
 def cliente_desde_dict(data: dict) -> Cliente:
-    cat = str(data.get("categoria", "")).strip().lower()
+    categoria = (data.get("categoria") or "regular").strip().lower()
 
-    if cat in ("premium",):
-        cls = ClientePremium
-    elif cat in ("corporativo", "corporate"):
-        cls = ClienteCorporativo
-    else:
-        cls = ClienteRegular  # también cubre "normal"
+    id_cliente = data.get("id_cliente")
+    nombre = data.get("nombre")
+    email = data.get("email")
+    telefono = data.get("telefono")
 
-    return cls(
-        data.get("id_cliente"),
-        data.get("nombre", ""),
-        data.get("email", ""),
-        data.get("telefono", ""),
-    )
+    if categoria == "premium":
+        return ClientePremium(id_cliente, nombre, email, telefono)
+    if categoria == "corporativo":
+        return ClienteCorporativo(id_cliente, nombre, email, telefono)
+    return ClienteRegular(id_cliente, nombre, email, telefono)
