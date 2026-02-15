@@ -1,4 +1,9 @@
 from src.services.cliente_service import ClienteService
+from src.utils.exceptions import (
+    ValidationError,
+    ClienteNoEncontradoError,
+    ArchivoDatosError,
+)
 
 
 def mostrar_menu():
@@ -10,8 +15,27 @@ def mostrar_menu():
     print("0) Salir")
 
 
-def pedir_opcion():
+def pedir_opcion() -> str:
     return input("Elige una opción: ").strip()
+
+
+def pedir_int(mensaje: str) -> int:
+    while True:
+        valor = input(mensaje).strip()
+        try:
+            return int(valor)
+        except ValueError:
+            print("❌ Debes ingresar un número entero.")
+
+
+def imprimir_cliente(c):
+    print(f"ID: {c.id_cliente}")
+    print(f"Nombre: {c.nombre}")
+    print(f"Email: {c.email}")
+    print(f"Teléfono: {c.telefono}")
+    print(f"Categoría: {c.tipo()}")
+    print(f"Beneficios: {c.get_beneficios()}")
+    print("-" * 30)
 
 
 def run_menu():
@@ -21,121 +45,67 @@ def run_menu():
         mostrar_menu()
         opcion = pedir_opcion()
 
-        if opcion == "1":
-            nombre = input("Nombre: ")
-            email = input("Email: ")
-            telefono = input("Teléfono: ")
-            categoria = input(
-                "Categoría (regular/premium/corporativo) [Enter=regular]: "
-            )
+        try:
+            if opcion == "1":
+                nombre = input("Nombre: ")
+                email = input("Email: ")
+                telefono = input("Teléfono: ")
+                categoria = input(
+                    "Categoría (regular/premium/corporativo) [Enter=regular]: "
+                )
 
-            nuevo_id = service.crear_cliente(nombre, email, telefono, categoria)
-            print(f"✅ Cliente guardado con ID {nuevo_id}")
+                nuevo_id = service.crear_cliente(nombre, email, telefono, categoria)
+                print(f"✅ Cliente guardado con ID {nuevo_id}")
 
-        elif opcion == "2":
-            clientes = service.listar_clientes()
+            elif opcion == "2":
+                clientes = service.listar_clientes()
+                if not clientes:
+                    print("No hay clientes aún.")
+                else:
+                    for c in clientes:
+                        imprimir_cliente(c)
 
-            if len(clientes) == 0:
-                print("No hay clientes registrados.")
+            elif opcion == "3":
+                id_cliente = pedir_int("ID a editar: ")
+
+                # Mostrar actual (si existe)
+                actual = service.obtener_por_id(id_cliente)
+                print("\n--- Cliente actual ---")
+                imprimir_cliente(actual)
+
+                print("Deja vacío para mantener el valor actual.")
+                nombre = input("Nuevo nombre: ")
+                email = input("Nuevo email: ")
+                telefono = input("Nuevo teléfono: ")
+                categoria = input("Nueva categoría (regular/premium/corporativo): ")
+
+                service.editar_cliente(id_cliente, nombre, email, telefono, categoria)
+                print("✅ Cliente actualizado.")
+
+            elif opcion == "4":
+                id_cliente = pedir_int("ID a eliminar: ")
+                confirm = input("¿Seguro? (s/n): ").strip().lower()
+                if confirm == "s":
+                    service.eliminar_cliente(id_cliente)
+                    print("✅ Cliente eliminado.")
+                else:
+                    print("Ok, no se eliminó.")
+
+            elif opcion == "0":
+                print("Saliendo...")
+                break
+
             else:
-                print("\n--- LISTA DE CLIENTES ---")
-                for c in clientes:
-                    print(f"ID: {c.id_cliente}")
-                    print(f"Nombre: {c.nombre}")
-                    print(f"Email: {c.email}")
-                    print(f"Teléfono: {c.telefono}")
-                    print(f"Categoría: {c.tipo()}")
-                    print(f"Beneficios: {c.get_beneficios()}")
-                    print("-" * 30)
+                print("Opción inválida.")
 
-        elif opcion == "3":
-            clientes = service.listar_clientes()
+        except ValidationError as e:
+            print(f"❌ {e}")
 
-            if len(clientes) == 0:
-                print("No hay clientes para editar.")
-                continue
+        except ClienteNoEncontradoError as e:
+            print(f"⚠️ {e}")
 
-            try:
-                id_buscar = int(input("Ingrese el ID del cliente a editar: "))
-            except ValueError:
-                print("ID inválido.")
-                continue
+        except ArchivoDatosError as e:
+            print(f"💾 {e}")
 
-            encontrado = None
-            for c in clientes:
-                if c.id_cliente == id_buscar:
-                    encontrado = c
-                    break
-
-            if encontrado is None:
-                print("Cliente no encontrado.")
-                continue
-
-            print("Deja vacío si no quieres modificar un campo.")
-            nuevo_nombre = input(f"Nuevo nombre ({encontrado.nombre}): ").strip()
-            nuevo_email = input(f"Nuevo email ({encontrado.email}): ").strip()
-            nuevo_telefono = input(f"Nuevo teléfono ({encontrado.telefono}): ").strip()
-            nueva_categoria = input(f"Nueva categoría ({encontrado.tipo()}): ").strip()
-
-            clientes_dict = service._cargar_clientes_dict()
-            for d in clientes_dict:
-                if d.get("id_cliente") == id_buscar:
-                    if nuevo_nombre:
-                        d["nombre"] = nuevo_nombre
-                    if nuevo_email:
-                        d["email"] = nuevo_email
-                    if nuevo_telefono:
-                        d["telefono"] = nuevo_telefono
-                    if nueva_categoria:
-                        d["categoria"] = nueva_categoria.strip().lower()
-                    break
-
-            service._guardar_clientes_dict(clientes_dict)
-            print("✅ Cliente actualizado correctamente.")
-
-        elif opcion == "4":
-            clientes = service.listar_clientes()
-
-            if len(clientes) == 0:
-                print("No hay clientes para eliminar.")
-                continue
-
-            try:
-                id_borrar = int(input("Ingrese el ID del cliente a eliminar: "))
-            except ValueError:
-                print("ID inválido.")
-                continue
-
-            encontrado = None
-            for c in clientes:
-                if c.id_cliente == id_borrar:
-                    encontrado = c
-                    break
-
-            if encontrado is None:
-                print("Cliente no encontrado.")
-                continue
-
-            confirmacion = (
-                input(f"¿Seguro que deseas eliminar a '{encontrado.nombre}'? (s/n): ")
-                .strip()
-                .lower()
-            )
-
-            if confirmacion != "s":
-                print("Operación cancelada.")
-                continue
-
-            clientes_dict = service._cargar_clientes_dict()
-            clientes_dict = [
-                d for d in clientes_dict if d.get("id_cliente") != id_borrar
-            ]
-            service._guardar_clientes_dict(clientes_dict)
-            print("✅ Cliente eliminado correctamente.")
-
-        elif opcion == "0":
-            print("Saliendo...")
-            break
-
-        else:
-            print("Opción inválida.")
+        except Exception as e:
+            print(f"💥 Error inesperado: {e}")
