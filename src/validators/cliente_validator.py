@@ -6,6 +6,7 @@ from src.utils.exceptions import (
     CategoriaInvalidaError,
 )
 
+
 CATEGORIAS_VALIDAS = {"regular", "premium", "corporativo"}
 
 

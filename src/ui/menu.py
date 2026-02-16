@@ -4,6 +4,9 @@ from src.utils.exceptions import (
     ClienteNoEncontradoError,
     ArchivoDatosError,
 )
+from src.utils.logger import configurar_logger
+
+logger = configurar_logger()
 
 
 def mostrar_menu():
@@ -102,10 +105,11 @@ def run_menu():
             print(f"❌ {e}")
 
         except ClienteNoEncontradoError as e:
-            print(f"⚠️ {e}")
+            print(f"⚠ {e}")
 
         except ArchivoDatosError as e:
-            print(f"💾 {e}")
+            print(f"📁 {e}")
 
         except Exception as e:
-            print(f"💥 Error inesperado: {e}")
+            logger.exception("Error inesperado en el menú")
+            print("⚠ Ocurrió un error inesperado. Revisa logs/app.log")
