@@ -1,0 +1,123 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+' =========================
+' Paquetes (carpetas)
+' =========================
+package "src.domain" {
+  class Cliente {
+    -id_cliente: int
+    -nombre: str
+    -email: str
+    -telefono: str
+    +__init__(id_cliente, nombre, email, telefono)
+    +tipo(): str
+    +get_beneficios(): str
+    +to_dict(): dict
+    +__str__(): str
+    +__eq__(other): bool
+  }
+
+  class ClienteRegular {
+    +tipo(): str
+    +get_beneficios(): str
+  }
+
+  class ClientePremium {
+    +tipo(): str
+    +get_beneficios(): str
+  }
+
+  class ClienteCorporativo {
+    +tipo(): str
+    +get_beneficios(): str
+  }
+
+  class ClienteFactory <<factory>> {
+    +cliente_desde_dict(data: dict): Cliente
+  }
+
+  Cliente <|-- ClienteRegular
+  Cliente <|-- ClientePremium
+  Cliente <|-- ClienteCorporativo
+}
+
+package "src.validators" {
+  class ClienteValidator <<utility>> {
+    +validar_nombre(nombre: str): str
+    +validar_email(email: str): str
+    +validar_telefono(telefono: str): str
+    +validar_categoria(categoria: str): str
+  }
+}
+
+package "src.persistence" {
+  class JsonRepo <<module>> {
+    +RUTA_JSON: str
+    +cargar_clientes(): list
+    +guardar_clientes(lista_clientes: list): void
+    +obtener_siguiente_id(lista_clientes: list): int
+  }
+}
+
+package "src.services" {
+  class ClienteService {
+    -repo
+    -clientes: list
+    +__init__(repo)
+    +listar_clientes(): list
+    +crear_cliente(nombre, email, telefono, categoria): Cliente
+    +editar_cliente(id_cliente, nombre, email, telefono, categoria): Cliente
+    +eliminar_cliente(id_cliente): void
+  }
+}
+
+package "src.ui" {
+  class Menu <<boundary>> {
+    +run_menu(): void
+  }
+}
+
+package "src.utils" {
+  class Logger <<utility>> {
+    +configurar_logger()
+    +get_logger()
+  }
+
+  class AppError
+  class ValidationError
+  class NombreInvalidoError
+  class EmailInvalidoError
+  class TelefonoInvalidoError
+  class CategoriaInvalidaError
+  class ClienteNoEncontradoError
+  class ArchivoDatosError
+
+  AppError <|-- ValidationError
+  ValidationError <|-- NombreInvalidoError
+  ValidationError <|-- EmailInvalidoError
+  ValidationError <|-- TelefonoInvalidoError
+  ValidationError <|-- CategoriaInvalidaError
+  AppError <|-- ClienteNoEncontradoError
+  AppError <|-- ArchivoDatosError
+}
+
+' =========================
+' Relaciones entre capas
+' =========================
+
+' Agregación: el service mantiene una lista de muchos clientes
+ClienteService "1" o-- "0..*" Cliente : gestiona
+
+' Dependencias/uso
+ClienteService ..> JsonRepo : usa (persistencia)
+ClienteService ..> ClienteValidator : valida datos
+ClienteService ..> ClienteFactory : crea subclases
+
+Menu ..> ClienteService : llama CRUD
+Menu ..> AppError : captura errores
+Menu ..> Logger : registra errores
+
+ClienteValidator ..> ValidationError : lanza
+
+@enduml

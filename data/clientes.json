@@ -15,14 +15,8 @@
     "id_cliente": 3,
     "nombre": "Felipe Godoy",
     "email": "elgatofeli@gmail.com",
-    "telefono": "+56912345678"
-  },
-  {
-    "id_cliente": 4,
-    "nombre": "jose perez",
-    "email": "perezjose@mail.com",
-    "telefono": "+56998745612",
-    "categoria": "normal"
+    "telefono": "+56912345678",
+    "categoria": "premium"
   },
   {
     "id_cliente": 5,
@@ -51,5 +45,12 @@
     "email": "emilatop@mail.com",
     "telefono": "+569879654213",
     "categoria": "corporativo"
+  },
+  {
+    "id_cliente": 9,
+    "nombre": "Martina Tortoli",
+    "email": "tiktokertortoli@mail.com",
+    "telefono": "956842369",
+    "categoria": "premium"
   }
 ]
